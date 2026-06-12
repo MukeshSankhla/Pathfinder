@@ -1,3 +1,40 @@
+/*
+ * ============================================================
+ *  Project Name : Pathfinder
+ *  Description  : A handheld GPS navigation device with
+ *                 compass, waypoint management, and real-time
+ *                 telemetry displayed on a 240x240 TFT screen.
+ *
+ *  Author       : Mukesh Sankhla, Maker Brains
+ *  Website      : https://www.makerbrains.com
+ *  GitHub       : https://github.com/MukeshSankhla/Pathfinder
+ * ============================================================
+ *
+ *  How it works:
+ *   - The ESP32 connects a DFRobot GNSS (GPS/BeiDou/GLONASS)
+ *     module via I2C to obtain real-time position, satellite
+ *     UTC date/time, speed, and altitude.
+ *   - A DFRobot BMM350 magnetometer provides compass heading
+ *     after a guided 8-direction hard/soft-iron calibration.
+ *   - A 240x240 SPI TFT display (ST7789) shows four screens:
+ *       1. GNSS Startup  - radar animation while acquiring sats
+ *       2. Compass View  - live rotating compass + nav arrow
+ *       3. Telemetry     - GPS status, heading, position,
+ *                          target waypoint, SAT UTC time,
+ *                          and local time (user timezone)
+ *       4. Menu/Settings - waypoint selection & calibration
+ *   - A rotary encoder (with push button) navigates menus;
+ *     single/double/triple clicks trigger different actions.
+ *   - A passive buzzer provides UI clicks, scroll ticks, and
+ *     off-course proximity warnings (mutable via triple-click).
+ *   - Up to 20 waypoints are stored in ESP32 NVS (flash).
+ *   - A WiFi Access Point ("PATHFINDER") hosts a web UI for
+ *     adding/deleting waypoints and selecting a timezone
+ *     (UTC offset) that is persisted in NVS and used to
+ *     compute local date/time from the GNSS UTC feed.
+ * ============================================================
+ */
+
 #include <WiFi.h>
 #include <WebServer.h>
 #include <Preferences.h>
@@ -169,6 +206,14 @@ int satCount = 0;
 float currentHeading = 0;
 
 // ==========================================
+// TIME & TIMEZONE DATA
+// ==========================================
+sTim_t gnssUTC;           // UTC time from GNSS (getUTC pattern from GNSS_Example.ino)
+sTim_t gnssDate;          // Date from GNSS  (getDate pattern from GNSS_Example.ino)
+float timezoneOffsetHours = 0.0;  // UTC offset in hours (e.g. 5.5 for IST)
+bool gnssTimeValid = false;       // True when GNSS has a valid time fix
+
+// ==========================================
 // ISR FOR ENCODER - VERIFIED LOGIC
 // ==========================================
 void IRAM_ATTR readEncoder() {
@@ -305,6 +350,84 @@ void handleDeleteWaypoint() {
     }
   }
   server.send(400, "text/plain", "Bad ID");
+}
+
+// ==========================================
+// TIMEZONE NVS STORAGE
+// ==========================================
+void loadTimezone() {
+  preferences.begin("settings", true);  // read-only
+  timezoneOffsetHours = preferences.getFloat("tz", 0.0);
+  preferences.end();
+  Serial.printf("Timezone loaded: UTC%+.2f\n", timezoneOffsetHours);
+}
+
+void saveTimezone(float offset) {
+  preferences.begin("settings", false);
+  preferences.putFloat("tz", offset);
+  preferences.end();
+  Serial.printf("Timezone saved: UTC%+.2f\n", offset);
+}
+
+// ==========================================
+// LOCAL DATETIME COMPUTATION
+// Based on GNSS_Example.ino getUTC() / getDate() pattern
+// ==========================================
+void getLocalDateTime(
+  sTim_t utc, sTim_t date, float offsetHours,
+  int &lHour, int &lMin, int &lSec,
+  int &lDay,  int &lMonth, int &lYear
+) {
+  // Convert offset to total seconds
+  long offsetSec = (long)(offsetHours * 3600.0);
+  long totalSec  = (long)utc.hour * 3600L + (long)utc.minute * 60L + (long)utc.second + offsetSec;
+
+  // Handle day rollover
+  int dayDelta = 0;
+  if (totalSec < 0)      { totalSec += 86400L; dayDelta = -1; }
+  if (totalSec >= 86400L){ totalSec -= 86400L; dayDelta =  1; }
+
+  lHour  = (int)(totalSec / 3600);
+  lMin   = (int)((totalSec % 3600) / 60);
+  lSec   = (int)(totalSec % 60);
+  lDay   = date.date  + dayDelta;
+  lMonth = date.month;
+  lYear  = date.year;
+
+  // Simple day-of-month boundary clamp (forward only; sufficient for display)
+  const int daysInMonth[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+  int maxDay = daysInMonth[lMonth];
+  // Leap year check for February
+  if (lMonth == 2 && ((lYear % 4 == 0 && lYear % 100 != 0) || (lYear % 400 == 0))) maxDay = 29;
+  if (lDay > maxDay) { lDay = 1; lMonth++; if (lMonth > 12) { lMonth = 1; lYear++; } }
+  if (lDay < 1)      { lMonth--; if (lMonth < 1) { lMonth = 12; lYear--; } lDay = daysInMonth[lMonth]; }
+}
+
+// ==========================================
+// TIMEZONE WEB API HANDLERS
+// ==========================================
+void handleGetTimezone() {
+  String json = "{\"tz\":" + String(timezoneOffsetHours, 2) + "}";
+  server.send(200, "application/json", json);
+}
+
+void handleSetTimezone() {
+  if (server.hasArg("plain")) {
+    String body = server.arg("plain");
+    // Parse {"tz":5.5}
+    int tzIdx = body.indexOf("\"tz\":");
+    if (tzIdx != -1) {
+      float tz = body.substring(tzIdx + 5).toFloat();
+      // Clamp to valid range
+      if (tz < -12.0) tz = -12.0;
+      if (tz >  14.0) tz =  14.0;
+      timezoneOffsetHours = tz;
+      saveTimezone(tz);
+      server.send(200, "text/plain", "OK");
+      return;
+    }
+  }
+  server.send(400, "text/plain", "Bad Request");
 }
 
 // ==========================================
@@ -611,13 +734,15 @@ void setup() {
   loadWaypoints();
   
   // Start WiFi AP
-  WiFi.softAP("PATHFINDER", "X12342026");
+  WiFi.softAP("PATHFINDER", "X123456789");
   
   // Configure web server
   server.on("/", HTTP_GET, handleRoot);
   server.on("/api/waypoints", HTTP_GET, handleGetWaypoints);
   server.on("/api/waypoints", HTTP_POST, handlePostWaypoint);
   server.on("/api/waypoints", HTTP_DELETE, handleDeleteWaypoint);
+  server.on("/api/timezone", HTTP_GET, handleGetTimezone);
+  server.on("/api/timezone", HTTP_POST, handleSetTimezone);
   server.begin();
 
   // Configure encoder pins
@@ -633,6 +758,8 @@ void setup() {
   loadMuteState();
   // Load calibration from NVS
   loadCalibration();
+  // Load timezone from NVS
+  loadTimezone();
 
   // Attach interrupts
   attachInterrupt(digitalPinToInterrupt(ENCODER_A), readEncoder, CHANGE);
@@ -702,6 +829,12 @@ void loop() {
   bmm350.getGeomagneticData();
   currentHeading = calculate_heading(bmm350.getGeomagneticData());
   
+  // Fetch GNSS time & date (pattern from GNSS_Example.ino lines 23-24)
+  gnssUTC  = gnss.getUTC();
+  gnssDate = gnss.getDate();
+  // Time is valid if GNSS has at least one satellite and year looks reasonable
+  gnssTimeValid = (satCount > 0 && gnssDate.year >= 2020);
+
   if (satCount > 0) {
     sLonLat_t lat = gnss.getLat();
     sLonLat_t lon = gnss.getLon();
@@ -1122,7 +1255,7 @@ void loop() {
     }
 
     // ==========================================
-    // DETAILED INFO STATE
+    // DETAILED INFO STATE  (TELEMETRY)
     // ==========================================
     case STATE_DETAILED: {
       static unsigned long lastDetDraw = 0;
@@ -1134,83 +1267,117 @@ void loop() {
       
       if (millis() - lastDetDraw > 500) {
         lastDetDraw = millis();
-        // Removed global fillScreen to prevent flicker
-        
-        
-        // GPS Status Card
-        screen.fillRoundRect(5, 38, 230, 45, 6, COLOR_SURFACE);
+
+        // ---- GPS STATUS Card (Y: 34-74) ----
+        screen.fillRoundRect(5, 34, 230, 38, 5, COLOR_SURFACE);
         screen.setTextSize(1);
         screen.setTextColor(COLOR_TEXT_SECONDARY);
-        screen.setCursor(12, 43);
+        screen.setCursor(12, 38);
         screen.print("GPS STATUS");
-        
         screen.setTextColor(COLOR_TEXT_PRIMARY);
-        screen.setCursor(12, 56);
+        screen.setCursor(12, 50);
         screen.print("Satellites: ");
-        if(satCount >= 6) screen.setTextColor(COLOR_SUCCESS);
+        if(satCount >= 6)      screen.setTextColor(COLOR_SUCCESS);
         else if(satCount >= 3) screen.setTextColor(COLOR_WARNING);
-        else screen.setTextColor(COLOR_DANGER);
+        else                   screen.setTextColor(COLOR_DANGER);
         screen.print(satCount);
-        
         screen.setTextColor(COLOR_TEXT_PRIMARY);
-        screen.setCursor(12, 68);
+        screen.setCursor(12, 62);
         screen.print("Speed: ");
         screen.print(currentSog, 1);
         screen.print(" kn");
-        
-        // Navigation Card
-        screen.fillRoundRect(5, 88, 230, 45, 6, COLOR_SURFACE);
+
+        // ---- NAVIGATION Card (Y: 78-118) ----
+        screen.fillRoundRect(5, 78, 230, 38, 5, COLOR_SURFACE);
         screen.setTextColor(COLOR_TEXT_SECONDARY);
-        screen.setCursor(12, 93);
+        screen.setCursor(12, 82);
         screen.print("NAVIGATION");
-        
         screen.setTextColor(COLOR_TEXT_PRIMARY);
-        screen.setCursor(12, 106);
+        screen.setCursor(12, 94);
         screen.print("Heading: ");
         screen.print(currentHeading, 1);
         screen.print((char)247);
-        
-        screen.setCursor(12, 118);
+        screen.setCursor(12, 106);
         screen.print("Altitude: ");
         screen.print(currentAlt, 1);
         screen.print(" m");
-        
-        // Position Card
-        screen.fillRoundRect(5, 138, 230, 35, 6, COLOR_SURFACE);
+
+        // ---- POSITION Card (Y: 122-142) ----
+        screen.fillRoundRect(5, 122, 230, 20, 4, COLOR_SURFACE);
         screen.setTextColor(COLOR_TEXT_SECONDARY);
-        screen.setCursor(12, 143);
-        screen.print("POSITION");
-        
+        screen.setCursor(12, 125);
+        screen.print("POS ");
         screen.setTextColor(COLOR_PRIMARY);
-        screen.setTextSize(1);
-        screen.setCursor(12, 156);
         screen.print(currentLat, 5);
-        screen.setCursor(124, 156);
+        screen.print(",");
         screen.print(currentLon, 5);
 
-        // Target Card (if selected)
+        // ---- TARGET Card (Y: 146-170) — always visible ----
+        screen.fillRoundRect(5, 146, 230, 24, 4, COLOR_SURFACE);
+        screen.setTextColor(COLOR_TEXT_SECONDARY);
+        screen.setCursor(12, 150);
+        screen.print("TARGET: ");
         if (selectedWaypointIndex != -1) {
           Waypoint dest = waypoints[selectedWaypointIndex];
-          
-          screen.fillRoundRect(5, 178, 230, 35, 6, COLOR_SURFACE);
-          screen.setTextColor(COLOR_TEXT_SECONDARY);
-          screen.setCursor(12, 183);
-          screen.print("TARGET: ");
           screen.setTextColor(COLOR_SUCCESS);
           screen.print(dest.name);
-          
           screen.setTextColor(COLOR_PRIMARY);
-          screen.setCursor(12, 196);
+          screen.setCursor(12, 162);
           screen.print(dest.lat, 5);
-          screen.setCursor(124, 196);
+          screen.setCursor(124, 162);
           screen.print(dest.lon, 5);
+        } else {
+          screen.setTextColor(COLOR_TEXT_SECONDARY);
+          screen.print("none selected");
         }
-        
-        // Instructions
+
+        // ---- TIME Card: SAT UTC + LOCAL (Y: 174-218) ----
+        screen.fillRoundRect(5, 174, 230, 44, 4, COLOR_SURFACE);
+
+        // SAT UTC row
+        screen.setTextColor(COLOR_TEXT_SECONDARY);
+        screen.setCursor(12, 178);
+        screen.print("SAT UTC  ");
+        screen.setTextColor(COLOR_TEXT_PRIMARY);
+        if (gnssTimeValid) {
+          char utcBuf[20];
+          snprintf(utcBuf, sizeof(utcBuf), "%04d/%02d/%02d %02d:%02d:%02d",
+            gnssDate.year, gnssDate.month, gnssDate.date,
+            gnssUTC.hour,  gnssUTC.minute, gnssUTC.second);
+          screen.print(utcBuf);
+        } else {
+          screen.setTextColor(COLOR_TEXT_SECONDARY);
+          screen.print("--/--/-- --:--:--");
+        }
+
+        // LOCAL time row
+        screen.setTextColor(COLOR_TEXT_SECONDARY);
+        screen.setCursor(12, 192);
+        screen.print("LOCAL    ");
+        if (gnssTimeValid) {
+          int lH, lM, lS, lD, lMo, lY;
+          getLocalDateTime(gnssUTC, gnssDate, timezoneOffsetHours,
+                           lH, lM, lS, lD, lMo, lY);
+          screen.setTextColor(COLOR_WARNING);
+          char localBuf[20];
+          snprintf(localBuf, sizeof(localBuf), "%04d/%02d/%02d %02d:%02d:%02d",
+            lY, lMo, lD, lH, lM, lS);
+          screen.print(localBuf);
+          screen.setTextColor(COLOR_TEXT_SECONDARY);
+          screen.setCursor(12, 204);
+          char offBuf[12];
+          snprintf(offBuf, sizeof(offBuf), "UTC%+.2f", timezoneOffsetHours);
+          screen.print(offBuf);
+        } else {
+          screen.setTextColor(COLOR_TEXT_SECONDARY);
+          screen.print("--/--/-- --:--:--");
+        }
+
+        // ---- Instructions ----
         screen.setTextSize(1);
         screen.setTextColor(COLOR_TEXT_SECONDARY);
-        screen.setCursor(5, 225);
-        screen.print("Click: compass  2x-Click: menu");
+        screen.setCursor(5, 224);
+        screen.print("Click:compass  2x:menu");
       }
 
       // SINGLE CLICK - Switch back to compass view
