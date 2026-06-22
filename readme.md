@@ -1,4 +1,4 @@
-![Cover.png](pathfinder_images/Cover.png)
+![Cover.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Cover.png)
 
 A month ago, I found myself holding a GNSS module and wondering:
 
@@ -34,15 +34,13 @@ To complete the project, everything was packaged inside a compact custom enclosu
 
 In this tutorial, I'll show you how I designed, assembled, programmed, and tested this DIY Waypoint Navigator (Pathfinder) so you can build one yourself.
 
-![DSC04940.JPG](pathfinder_images/image_1.jpg)
+![DSC04940.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_1.jpg)
+![DSC04925.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_2.jpg)
+![DSC04927.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_3.jpg)
 
-![DSC04925.JPG](pathfinder_images/image_2.jpg)
+# Supplies
 
-![DSC04927.JPG](pathfinder_images/image_3.jpg)
-
-# **Supplies**
-
-**![DSC04821.JPG](pathfinder_images/image_4.jpg)**
+**![DSC04821.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_4.jpg)**
 
 **Electronics**
 
@@ -71,11 +69,11 @@ In this tutorial, I'll show you how I designed, assembled, programmed, and teste
 1.  [Arduino IDE](https://www.arduino.cc/)
 2.  [Autodesk Fusion 360](https://www.autodesk.com/in/products/fusion-360/overview) (for enclosure design and modification)
 
-![DSC04824.JPG](pathfinder_images/image_5.jpg)![DSC04826.JPG](pathfinder_images/image_6.jpg)![DSC04827.JPG](pathfinder_images/image_7.jpg)![DSC04834.JPG](pathfinder_images/image_8.jpg)![DSC04835.JPG](pathfinder_images/image_9.jpg)![DSC04830.JPG](pathfinder_images/image_10.jpg)![DSC04833.JPG](pathfinder_images/image_11.jpg)![DSC04854.JPG](pathfinder_images/image_12.jpg)
+![DSC04824.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_5.jpg)![DSC04826.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_6.jpg)![DSC04827.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_7.jpg)![DSC04834.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_8.jpg)![DSC04835.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_9.jpg)![DSC04830.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_10.jpg)![DSC04833.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_11.jpg)![DSC04854.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_12.jpg)
 
-# **Step 1: What Is GNSS, How Does It Work?**
+# Step 1: What Is GNSS, How Does It Work?
 
-**![GNSS.png](pathfinder_images/image_13.png)**
+**![GNSS.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_13.png)**
 
 Before building the Pathfinder, it's helpful to understand the technology that makes it possible.
 
@@ -138,9 +136,9 @@ The GNSS module continuously provides:
 
 Once a destination waypoint is entered, the ESP32 compares the current GNSS coordinates with the destination coordinates and calculates:
 
-# **Step 2: Distance to Destination: the Haversine Formula**
+# Step 2: Distance to Destination: the Haversine Formula
 
-**![Distance.png](pathfinder_images/image_14.png)**
+**![Distance.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_14.png)**
 
 Once the navigator knows your current coordinates and the destination coordinates, it needs to calculate the distance between those two points.
 
@@ -166,9 +164,9 @@ In the firmware, the calculated distance is displayed in:
 
 This provides a simple and intuitive way to track progress toward the target.
 
-# **Step 3: Bearing to Destination**
+# Step 3: Bearing to Destination
 
-**![Bearing.png](pathfinder_images/image_15.png)**
+**![Bearing.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_15.png)**
 
 Knowing the distance alone isn't enough, you also need to know **which direction to travel**.
 
@@ -203,9 +201,9 @@ And your destination is:
 
 The bearing calculation determines the direction from your current location to the waypoint. In this example, the destination would be roughly northeast of your position.
 
-# **Step 4: Combining Bearing With the Digital Compass**
+# Step 4: Combining Bearing With the Digital Compass
 
-**![Compass.png](pathfinder_images/image_16.png)**
+**![Compass.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_16.png)**
 
 The calculated bearing tells us where the destination is relative to **true north**, but it does not tell us which way the device is currently facing.
 
@@ -234,9 +232,9 @@ The navigation arrow on the display is rotated by this difference, providing rea
 
 This combination of **GNSS positioning**, **bearing calculation**, and **digital compass heading** is what allows the Pathfinder to continuously point toward the destination, even when the user is standing still.
 
-# **Step 5: Why I Chose the FireBeetle 2 ESP32-C6**
+# Step 5: Why I Chose the FireBeetle 2 ESP32-C6
 
-**![DSC04839.JPG](pathfinder_images/image_17.jpg)**
+**![DSC04839.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_17.jpg)**
 
 At the heart of this project is the [**DFRobot FireBeetle 2 ESP32-C6**](https://www.dfrobot.com/product-2771.html)**,** which turned out to be an excellent fit for a portable navigation device.
 
@@ -252,9 +250,9 @@ This significantly improves the user experience while keeping the hardware simpl
 
 Overall, the FireBeetle 2 ESP32-C6 provided the perfect balance of **cost, features, performance, and power management** for this Pathfinder.
 
-# **Step 6: Designing the Enclosure in Fusion 360**
+# Step 6: Designing the Enclosure in Fusion 360
 
-**![](pathfinder_images/image_18.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_18.png)**
 
 I designed a custom enclosure in **Fusion 360** to transform the prototype into a compact handheld device.
 
@@ -293,11 +291,11 @@ You can download the Fusion 360 design files and STL files from this project and
 
 [**Pathfinder Fusion 360 File**](https://a360.co/4v1CVzj)
 
-**![IM1.png](pathfinder_images/image_19.png)![Im2.png](pathfinder_images/image_20.png)![IM9.png](pathfinder_images/image_21.png)**
+**![IM1.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_19.png)![Im2.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_20.png)![IM9.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_21.png)**
 
-# **Step 7: 3D Printing the Parts**
+# Step 7: 3D Printing the Parts
 
-**![DSC04842.JPG](pathfinder_images/image_22.jpg)**
+**![DSC04842.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_22.jpg)**
 
 With the CAD design complete, it's time to print the enclosure.
 
@@ -316,15 +314,15 @@ Print the following components:
 
 I printed all parts using standard PLA settings with a 0.4 mm nozzle and 0.2 mm layer height. No special print settings are required, and all parts can be printed without support material.
 
-![DSC04846.JPG](pathfinder_images/image_23.jpg)![DSC04844.JPG](pathfinder_images/image_24.jpg)![DSC04849.JPG](pathfinder_images/image_25.jpg)![DSC04848.JPG](pathfinder_images/image_26.jpg)
+![DSC04846.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_23.jpg)![DSC04844.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_24.jpg)![DSC04849.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_25.jpg)![DSC04848.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_26.jpg)
 
-# **Step 8: Mounting the Modules**
+# Step 8: Mounting the Modules
 
 With the enclosure printed, it's time to install the electronics into the housing.
 
 **Mounting the ESP32-C6:**
 
-**![DSC04861.JPG](pathfinder_images/image_27.jpg)![](pathfinder_images/image_28.png)**
+**![DSC04861.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_27.jpg)![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_28.png)**
 
 Start by placing the **FireBeetle 2 ESP32-C6** into its designated mounting position inside the housing.
 
@@ -334,11 +332,11 @@ Once aligned, secure the board using:
 
 1.  **2× M2 screws**
 
-**![ESP_optimized.gif](pathfinder_images/ESP_optimized.gif)**
+**![ESP_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/ESP_optimized.gif)**
 
 **Mounting the GNSS and Magnetometer Modules:**
 
-**![DSC04863.JPG](pathfinder_images/image_29.jpg)![](pathfinder_images/image_30.png)**
+**![DSC04863.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_29.jpg)![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_30.png)**
 
 Next, position the **GNSS Positioning Module** and the **BMM350 Magnetometer Module** on their respective mounting locations.
 
@@ -347,21 +345,21 @@ Align the mounting holes on each module with the standoffs in the housing and se
 1.  **2× M3 screws for the GNSS module**
 2.  **2× M3 screws for the BMM350 module**
 
-**![ESP_optimized.gif](pathfinder_images/ESP_optimized.gif)**
+**![ESP_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/ESP_optimized.gif)**
 
 Make sure both modules sit flat against the mounting surface before tightening the screws.
 
-![DSC04865.JPG](pathfinder_images/image_31.jpg)![DSC04864.JPG](pathfinder_images/image_32.jpg)
+![DSC04865.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_31.jpg)![DSC04864.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_32.jpg)
 
-# **Step 9: Mounting the Encoder, Buzzer, and Power Switch**
+# Step 9: Mounting the Encoder, Buzzer, and Power Switch
 
-**![Modules_optimized.gif](pathfinder_images/Modules_optimized.gif")**
+**![Modules_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Modules_optimized.gif")**
 
 With the main modules installed, it's time to mount the user interface components.
 
 **Mounting the Rotary Encoder**
 
-**![](pathfinder_images/image_34.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_34.png)**
 
 Place the **rotary encoder** onto the two standoffs provided inside the housing.
 
@@ -369,7 +367,7 @@ Align the mounting holes and secure the encoder using:
 
 1.  **2× M2 screws**
 
-**![Encoder_optimized.gif](pathfinder_images/Encoder_optimized.gif)**
+**![Encoder_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Encoder_optimized.gif)**
 
 Ensure the encoder shaft is centered in the front panel opening and rotates freely.
 
@@ -384,10 +382,10 @@ Ensure the encoder shaft is centered in the front panel opening and rotates free
 2.  Press it firmly into position until it sits securely in the slot.
 3.  If the switch feels loose, apply a **small amount of quick-setting glue** to secure it. Be careful not to get glue inside the switch mechanism, as this may affect its operation.
 
-**![Switch_optimized.gif](pathfinder_images/Switch_optimized.gif)**
-![](pathfinder_images/image_35.png)![DSC04868.JPG](pathfinder_images/image_36.jpg)
+**![Switch_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Switch_optimized.gif)**
+![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_35.png)![DSC04868.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_36.jpg)
 
-# **Step 10: Mounting the GNSS Antenna**
+# Step 10: Mounting the GNSS Antenna
 
 Place the **GNSS antenna** into the dedicated antenna compartment in the housing, as shown in the images. The enclosure is designed to hold the antenna securely while keeping it positioned at the top of the device.
 
@@ -395,11 +393,11 @@ Once the antenna is in place, connect the antenna cable to the **GNSS module's a
 
 Be careful while attaching the connector, as it is small and delicate. Avoid pulling on the cable itself; always handle it by the connector body.
 
-![DSC04871.JPG](pathfinder_images/image_37.jpg)![DSC04872.JPG](pathfinder_images/image_38.jpg)![DSC04874.JPG](pathfinder_images/image_39.jpg)![DSC04873.JPG](pathfinder_images/image_40.jpg)
+![DSC04871.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_37.jpg)![DSC04872.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_38.jpg)![DSC04874.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_39.jpg)![DSC04873.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_40.jpg)
 
-# **Step 11: Wiring Everything Together**
+# Step 11: Wiring Everything Together
 
-**![](pathfinder_images/image_41.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Connections.png)**
 
 Up to this point, the build has been fairly clean and straightforward. Now comes the part that ties everything together: **wiring and soldering**.
 
@@ -467,11 +465,11 @@ After all connections are complete:
 
 Once everything is wired and tested, you're ready to install the display and close the enclosure.
 
-![DSC04875.JPG](pathfinder_images/image_42.jpg)
+![DSC04875.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_42.jpg)
 
-# **Step 12: Mounting the Display**
+# Step 12: Mounting the Display
 
-**![DSC04876.JPG](pathfinder_images/image_43.jpg)**
+**![DSC04876.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_43.jpg)**
 
 With all the internal components wired, it's time to install the display into the front cover.
 
@@ -485,11 +483,11 @@ Make sure the display sits flat against the cover and is centered within the dis
 
 After mounting, the front cover assembly is ready to be connected to the main housing and prepared for final assembly.
 
-![DSC04877.JPG](pathfinder_images/image_44.jpg)
+![DSC04877.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_44.jpg)
 
-# **Step 13: Connecting the Display to the ESP32**
+# Step 13: Connecting the Display to the ESP32
 
-**![Display Connection.png](pathfinder_images/image_45.png)**
+**![Display Connection.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_45.png)**
 
 This is one of the easiest steps in the entire build thanks to the **GDI (General Display Interface) connector** used by the display and the FireBeetle ESP32-C6.
 
@@ -499,11 +497,11 @@ Since both power and communication signals are carried through this single cable
 
 Before connecting the cable, make sure to check the **connector orientation** carefully and compare it with the reference image. Connecting the cable incorrectly may prevent the display from working properly.
 
-![DSC04879.JPG](pathfinder_images/image_46.jpg)![DSC04878.JPG](pathfinder_images/image_47.jpg)![DSC04883.JPG](pathfinder_images/image_48.jpg)![DSC04880.JPG](pathfinder_images/image_49.jpg)
+![DSC04879.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_46.jpg)![DSC04878.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_47.jpg)![DSC04883.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_48.jpg)![DSC04880.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_49.jpg)
 
-# **Step 14: Final Assembly**
+# Step 14: Final Assembly
 
-**![DSC04884.JPG](pathfinder_images/image_50.jpg)**
+**![DSC04884.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_50.jpg)**
 
 With all the electronics installed and tested, it's time to close the enclosure and complete the build.
 
@@ -515,7 +513,7 @@ Next, position the front cover onto the housing and check that:
 2.  The display cable is routed safely.
 3.  The encoder shaft passes cleanly through the cover opening.
 
-![DSC04885.JPG](pathfinder_images/image_51.jpg)![DSC04886.JPG](pathfinder_images/image_52.jpg)
+![DSC04885.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_51.jpg)![DSC04886.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_52.jpg)
 
 Once everything is aligned, secure the cover using:
 
@@ -523,15 +521,15 @@ Once everything is aligned, secure the cover using:
 
 Insert the screws from the back of the cover and tighten them evenly until the enclosure is firmly closed.
 
-![DSC04887.JPG](pathfinder_images/image_53.jpg)![DSC04890.JPG](pathfinder_images/image_54.jpg)
+![DSC04887.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_53.jpg)![DSC04890.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_54.jpg)
 
 After assembly, install the 3D-printed encoder knob onto the encoder shaft and verify that it rotates smoothly.
 
-![DSC04891.JPG](pathfinder_images/image_55.jpg)![DSC04892.JPG](pathfinder_images/image_56.jpg)![DSC04894.JPG](pathfinder_images/image_57.jpg)
+![DSC04891.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_55.jpg)![DSC04892.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_56.jpg)![DSC04894.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_57.jpg)
 
 Your DIY Pathfinder is now fully assembled and ready for power-up, configuration, and field testing.
 
-# **Step 15: Flashing the Firmware**
+# Step 15: Flashing the Firmware
 
 With the hardware assembled, the final step is to upload the Pathfinder firmware to the ESP32-C6.
 
@@ -543,7 +541,7 @@ Before uploading the code, download the latest Pathfinder firmware from GitHub: 
 2.  Extract the ZIP file.
 3.  Open the **Pathfinder.ino** project in Arduino IDE.
 
-![](pathfinder_images/image_58.png)
+![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_58.png)
 
 **Install Arduino IDE:** If you don't already have it installed, download and install the Arduino IDE from the official website:
 
@@ -567,7 +565,7 @@ Install Required Libraries
 
 **DFRobot GNSS Library:**
 
-**![](pathfinder_images/image_59.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_59.png)**
 
 *   Open **Library Manager**
 *   Sketch → Include Library → Manage Libraries
@@ -579,7 +577,7 @@ DFRobot\_GNSS
 
 **DFRobot GDL Display Library:**
 
-**![](pathfinder_images/image_60.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_60.png)**
 
 Search for:
 
@@ -600,7 +598,7 @@ The library will now be added to your Arduino installation.
 
 **Select the Correct Board:**
 
-**![](pathfinder_images/image_61.png)**
+**![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_61.png)**
 
 Connect the FireBeetle 2 ESP32-C6 to your computer using a USB Type-C cable.
 
@@ -612,13 +610,13 @@ Then configure Arduino IDE:
 *   Click **Upload**.
 *   Wait for compilation and flashing to complete.
 
-![](pathfinder_images/image_62.png)
+![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_62.png)
 
 Once the upload finishes successfully, the Pathfinder will reboot automatically and display the startup screen.
 
-**![Boot_optimized.gif](pathfinder_images/Boot_optimized.gif)**
+**![Boot_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Boot_optimized.gif)**
 
-# **Step 16: Connect to the Access Point and Configure Pathfinder**
+# Step 16: Connect to the Access Point and Configure Pathfinder
 
 With the firmware flashed, it's time to configure your Pathfinder.
 
@@ -642,7 +640,7 @@ Once connected to the Pathfinder network, open a web browser and navigate to:
 
 You should see the Pathfinder configuration interface.
 
-![](pathfinder_images/image_63.png)
+![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_63.png)
 
 **Add Waypoints:**
 
@@ -677,7 +675,7 @@ Once saved, the locations are automatically loaded and become available within t
 
 **Calibrate the Compass:**
 
-**![Calibaration_optimized.gif](pathfinder_images/Calibaration_optimized.gif)**
+**![Calibaration_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/Calibaration_optimized.gif)**
 
 Before using Pathfinder for navigation, the compass must be calibrated.
 
@@ -717,7 +715,7 @@ If you notice that the navigation arrow is not pointing accurately toward the de
 
 **Start Navigating:**
 
-**![SelectLoc_optimized.gif](pathfinder_images/SelectLoc_optimized.gif)**
+**![SelectLoc_optimized.gif](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/SelectLoc_optimized.gif)**
 
 Once your locations have been added and the compass has been calibrated:
 
@@ -732,9 +730,9 @@ The main screen will now display:
 
 As you move, the distance updates in real time while the compass continuously keeps the navigation arrow pointed toward your selected waypoint.
 
-# **Step 17: How the Pathfinder Code Works**
+# Step 17: How the Pathfinder Code Works
 
-**![ChatGPT Image Jun 12, 2026, 01\_44\_23 PM.png](pathfinder_images/image_64.png)**
+**![ChatGPT Image Jun 12, 2026, 01\_44\_23 PM.png](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_64.png)**
 
 The Pathfinder firmware combines data from the GNSS receiver and the BMM350 magnetometer to create a real-time waypoint navigation system.
 
@@ -817,29 +815,36 @@ Depending on how the magnetometer is mounted inside the enclosure, the compass d
 
 To correct this, Pathfinder includes two compass configuration settings:
 
+```cpp
 // ==========================================
-
 // COMPASS ORIENTATION SETTINGS
-
 // ==========================================
-
-int heading\_offset = 180;
-
+intheading\_offset = 180;
 bool reverse\_compass = true;
+```
+
 
 **heading\_offset:** This value rotates the entire compass heading.
 
 Example:
 
+```
 int heading\_offset = 0;
+```
 
 No rotation applied.
 
-int heading\_offset = 90;
+```
+int 
+heading\_offset = 90;
+```
 
 Compass rotates by 90 degrees.
 
-int heading\_offset = 180;
+```
+int
+heading\_offset = 180;
+```
 
 Compass rotates by 180 degrees.
 
@@ -854,11 +859,15 @@ Typical values:
 
 **reverse\_compass:** This setting reverses the compass rotation direction.
 
+```
 bool reverse\_compass = false;
+```
 
 Normal operation.
 
+```
 bool reverse\_compass = true;
+```
 
 Reverse heading calculation.
 
@@ -888,27 +897,35 @@ The heading should increase smoothly:
 
 If the values decrease instead, try:
 
+```
 reverse\_compass = !reverse\_compass;
+```
 
 Test 3: Check Orientation
 
 If North appears as South:
 
+```
 heading\_offset = 180;
+```
 
 If North appears as East:
 
+```
 heading\_offset = 90;
+```
 
 If North appears as West:
 
+```
 heading\_offset = 270;
+```
 
 These two settings allow the firmware to compensate for different magnetometer mounting orientations without requiring any hardware changes.
 
-# **Conclusion**
+# Conclusion
 
-**![DSC04931.JPG](pathfinder_images/image_65.jpg)![](pathfinder_images/image_66.png)**
+**![DSC04931.JPG](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_65.jpg)![](https://github.com/MukeshSankhla/Pathfinder/raw/main/pathfinder_images/image_66.png)**
 
 Building Pathfinder was a fascinating journey that combined embedded electronics, GNSS positioning, digital compasses, wireless configuration, firmware development, 3D design, and product prototyping into a single project.
 
