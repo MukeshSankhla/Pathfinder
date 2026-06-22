@@ -1,4 +1,4 @@
-![DSC04940.JPG](pathfinder_images/image_1.jpg)A month ago, I found myself holding a GNSS module and wondering:
+![DSC04940.JPG](pathfinder_images/cover.png)A month ago, I found myself holding a GNSS module and wondering:
 
 "Can I build a navigation device where I simply enter destination coordinates, and the device continuously shows the distance and direction to the target while I'm walking?"
 
@@ -32,7 +32,11 @@ To complete the project, everything was packaged inside a compact custom enclosu
 
 In this tutorial, I'll show you how I designed, assembled, programmed, and tested this DIY Waypoint Navigator (Pathfinder) so you can build one yourself.
 
-![DSC04925.JPG](pathfinder_images/image_2.jpg)![DSC04927.JPG](pathfinder_images/image_3.jpg)
+![DSC04940.JPG](pathfinder_images/image_1.jpg)
+
+![DSC04925.JPG](pathfinder_images/image_2.jpg)
+
+![DSC04927.JPG](pathfinder_images/image_3.jpg)
 
 # **Supplies**
 
