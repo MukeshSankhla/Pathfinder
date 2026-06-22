@@ -1,4 +1,4 @@
-![DSC04940.JPG](pathfinder_images/cover.png)A month ago, I found myself holding a GNSS module and wondering:
+![DSC04940.JPG](pathfinder_images/Cover.png)A month ago, I found myself holding a GNSS module and wondering:
 
 "Can I build a navigation device where I simply enter destination coordinates, and the device continuously shows the distance and direction to the target while I'm walking?"
 
